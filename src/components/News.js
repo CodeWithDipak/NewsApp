@@ -2,21 +2,22 @@ import React, { Component } from 'react'
 import NewsItems from './NewsItems'
 import Spinner from './Spinner'
 import PropTypes from 'prop-types'
+import InfiniteScroll from "react-infinite-scroll-component";
+
 
 export default class News extends Component {
+
     static defaultProp = {
         country: "in",
-        pageSize: 8,
-        category: 'general'
+        category: 'entertainment'
     }
 
     static propType = {
         country: PropTypes.string,
-        pageSize: PropTypes.number,
         category: PropTypes.string
     }
 
-    capitalized = (string)=>{
+    capitalized = (string) => {
         let newString = string.toLowerCase();
         return newString.charAt(0).toUpperCase() + newString.slice(1);
     }
@@ -24,56 +25,47 @@ export default class News extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            articles: [],
+            results: [],
             loading: true,
-            page: 1
+            page: `1677515278c5b5c10fecb94a7bae486ba7b0e67007`
         }
         document.title = `${this.capitalized(this.props.category)} - NewsMonkey`;
     }
 
-
-    async componentDidMount() {
-        const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=08b6f09833ec47d3875386c1379ce324&page=${this.state.page}&pageSize=${this.props.pageSize}`
-        this.setState({
-            loading: true
-        })
+    componentDidMount = async () => {
+        const url = `https://newsdata.io/api/1/news?apikey=pub_1793284c26c757b66eec436833a91500797ed&country=${this.props.country}&language=en&category=${this.props.category}&page=${this.state.page} `
         let data = await fetch(url);
         let parsedData = await data.json();
+        console.log(parsedData);
         this.setState({
             totalResults: parsedData.totalResults,
-            articles: parsedData.articles,
-            loading: false
+            results: this.state.results.concat(parsedData.results),
+            page : parsedData.nextPage
         });
-    }
-
-    handlePrevClick = async () => {
-        this.setState({ page: this.state.page - 1 });
-        this.componentDidMount();
-    }
-
-    handleNextClick = async () => {
-        this.setState({ page: this.state.page + 1 });
-        this.componentDidMount();
-
     }
 
     render() {
         return (
-            <div className='container my-3'>
-                <h1 className='text-center'>NewsMonkey - Top {this.capitalized(this.props.category)} Headlines</h1>
-                {this.state.loading && <Spinner />}
-                <div className='row' >
-                    {this.state.articles.map((element) => {
-                        return (!this.state.loading && <div className='col-md-3' key={element.url}>
-                            <NewsItems title={element.title ? element.title : ""} description={element.description ? element.description : ""} imgUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
-                        </div>)
-                    })}
-                </div>
-                <div className="container d-flex justify-content-between">
-                    <button disabled={this.state.page <= 1} type="button" className="btn btn-dark" onClick={this.handlePrevClick}>&larr; Previous</button>
-                    <button disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)} type="button" className="btn btn-dark" onClick={this.handleNextClick}>Next &rarr;</button>
-                </div>
-            </div>
+            <>
+                <h1 className='text-center my-3'>NewsMonkey - Top {this.capitalized(this.props.category)} Headlines</h1>
+                <InfiniteScroll
+                    dataLength={this.state.results.length}
+                    next={this.componentDidMount}
+                    hasMore={this.state.results.length !== this.state.totalResults}
+                    loader={<Spinner/>}
+                >
+                    <div className='container my-3' >
+                        <div className='row' >
+                            {this.state.results.map((element) => {
+                                return (<div className='col-md-3' key={element.link}>
+                                    <NewsItems title={element.title ? element.title.slice(0,55) : ""} description={element.description ? element.description.slice(0,225) : ""} imgUrl={element.image_url} newsUrl={element.link} date={element.pubDate}/>
+                                </div>)
+                            })}
+                        </div>
+                    </div>
+                </InfiniteScroll>
+            </>
+
         )
     }
 }

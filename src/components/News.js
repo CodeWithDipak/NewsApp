@@ -27,7 +27,7 @@ export default class News extends Component {
         this.state = {
             results: [],
             loading: true,
-            page: `1677515278c5b5c10fecb94a7bae486ba7b0e67007`
+            page: ``
         }
         document.title = `${this.capitalized(this.props.category)} - NewsMonkey`;
     }
@@ -36,9 +36,7 @@ export default class News extends Component {
         this.props.setProgress(20)
         const url = `https://newsdata.io/api/1/news?apikey=${this.props.apiKey}&country=${this.props.country}&language=en&category=${this.props.category}&page=${this.state.page} `
         let data = await fetch(url);
-        this.props.setProgress(40)
         let parsedData = await data.json();
-        this.props.setProgress(60)
         this.setState({
             totalResults: parsedData.totalResults,
             results: this.state.results.concat(parsedData.results),
@@ -59,8 +57,8 @@ export default class News extends Component {
                 >
                     <div className='container my-3' >
                         <div className='row' >
-                            {this.state.results.map((element) => {
-                                return (<div className='col-md-3' key={element.link}>
+                            {this.state.results.map((element,index) => {
+                                return (<div className='col-md-3' key={index}>
                                     <NewsItems title={element.title ? element.title.slice(0,55) : ""} description={element.description ? element.description.slice(0,225) : ""} imgUrl={element.image_url} newsUrl={element.link} date={element.pubDate}/>
                                 </div>)
                             })}

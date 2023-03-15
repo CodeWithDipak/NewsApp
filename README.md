@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Information about Website
 
-It is basically a website that shows the Headlines of the latest news from different section like Politics, entertainment, etc. It is basically create with news API and React.js. When you click on the news, you will sended to actual news website. You will have all your news headlines at one place and then you can choose what to see. 
+It is basically a website that shows the Headlines of the latest news from different section like Politics, entertainment, etc. It is basically create with news API and React.js. When you click on the news, you will redirected to actual news website. You will have all your news headlines at one place and then you can choose what to see. 
 
 ## Available Scripts
 
